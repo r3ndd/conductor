@@ -25,35 +25,36 @@ Conductor ships built-in agent prompt markdown files in `src/agents/prompts/` an
 
 ## Commands
 
-- `/build`: switch active Conductor mode to `build`
-- `/plan`: switch active Conductor mode to `plan`
-- `/brainstorm [prompt]`: persist a planning artifact in `.conductor/plans/`
+- `/conductor`: switch to Conductor primary agent mode
+- `/brainstorm [prompt]`: orchestrate brainstorming and persist `.conductor/plans/` artifact
 - `/branstorm [prompt]`: alias for `/brainstorm` (common typo)
-- `/research [prompt]`: run the researcher subagent and persist `.conductor/research/`
-- `/architect [prompt]`: run the architect subagent and persist `.conductor/designs/`
-- `/code [prompt]`: run the coding pipeline (`coder -> reviewer -> debugger if needed -> committer`)
+- `/research [prompt]`: orchestrate researcher flow and persist `.conductor/research/` artifact
+- `/architect [prompt]`: orchestrate architect flow and persist `.conductor/designs/` artifact
+- `/code [prompt]`: orchestrate visible pipeline (`coder -> reviewer -> debugger if needed -> committer`)
 - `/conductor-doctor`: show Context7/Codanna integration diagnostics
 
 ## Behavior
 
-- Default primary mode is `build`.
+- Default primary mode is `conductor`.
+- Conductor no longer overrides native `build` and `plan` agents.
+- Command workflows inject an explicit orchestration prompt in `command.execute.before`.
+- Subagent work is delegated visibly through native subagent/task flow, not hidden plugin-created sessions.
+- Subagent learn extraction is prompted via `@src/commands/learn.md`.
 - `.conductor/state.json` stores active mode, pipeline stage, pending steps, and latest artifact ids.
-- AGENTS memory is enabled immediately: durable non-obvious notes are deduplicated into `AGENTS.md`.
 - Config merge is non-destructive by default: user-defined commands, agents, and MCP keys are preserved.
 
 ## Permissions model
 
-- `build` primary agent: full coding permissions (`edit`, `bash`, `webfetch`).
-- `plan` primary agent: read-first posture (`edit` denied, `webfetch` allowed).
-- Subagents are least-privilege by role.
+- `conductor` primary agent: full orchestration permissions (`edit`, `bash`, `webfetch`).
+- Native OpenCode `build`/`plan` remain available and unmodified.
+- Conductor specialist subagents are least-privilege by role.
 - `committer` only grants `bash.git` and does not auto-push.
 
 ## Agent prompt files
 
 Conductor agent prompts are defined as markdown files with YAML frontmatter and markdown body:
 
-- `src/agents/prompts/build.md`
-- `src/agents/prompts/plan.md`
+- `src/agents/prompts/conductor.md`
 - `src/agents/prompts/researcher.md`
 - `src/agents/prompts/architect.md`
 - `src/agents/prompts/coder.md`
@@ -104,8 +105,8 @@ Conductor supports optional plugin tuple options:
     [
       "file:///absolute/path/to/conductor/dist/index.js",
       {
-        "defaultMode": "build",
-        "forceAgents": ["build"],
+        "defaultMode": "conductor",
+        "forceAgents": ["conductor"],
         "forceCommands": ["code"],
         "forceMcp": ["context7"]
       }
@@ -114,7 +115,7 @@ Conductor supports optional plugin tuple options:
 }
 ```
 
-- `defaultMode`: `build` or `plan`
+- `defaultMode`: `conductor`
 - `forceAgents`, `forceCommands`, `forceMcp`: selectively force plugin-owned keys in collisions
 
 ## Development

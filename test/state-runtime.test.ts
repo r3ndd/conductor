@@ -5,7 +5,6 @@ import { join } from "node:path"
 
 import { writeArtifact } from "../src/knowledge/artifacts"
 import { buildCommandPrompt } from "../src/commands/runtime"
-import { appendMemory } from "../src/knowledge/memory"
 import { buildCompactionContext } from "../src/knowledge/compact"
 import { readState, setStage, switchMode } from "../src/knowledge/state"
 
@@ -18,13 +17,13 @@ async function withTmp<T>(fn: (root: string) => Promise<T>) {
   }
 }
 
-describe("state, artifacts, and memory", () => {
+describe("state and runtime prompts", () => {
   it("persists mode and stage in state file", async () => {
     await withTmp(async (root) => {
-      await switchMode(root, "plan")
+      await switchMode(root, "conductor")
       await setStage(root, "reviewer")
       const state = await readState(root)
-      expect(state.mode).toBe("plan")
+      expect(state.mode).toBe("conductor")
       expect(state.stage).toBe("reviewer")
     })
   })
@@ -36,9 +35,9 @@ describe("state, artifacts, and memory", () => {
         root,
         topic: "Add API cache",
         text: "# Plan\n\nShip caching.",
-        mode: "plan",
+        mode: "conductor",
         session: "s1",
-        agent: "plan",
+        agent: "conductor",
         command: "/brainstorm",
       })
       const text = await Bun.file(out.path).text()
@@ -47,42 +46,30 @@ describe("state, artifacts, and memory", () => {
     })
   })
 
-  it("deduplicates AGENTS memory entries", async () => {
-    await withTmp(async (root) => {
-      const first = await appendMemory(root, "Use codanna only for diagnostics in v1.")
-      const second = await appendMemory(root, "Use codanna only for diagnostics in v1.")
-      const text = await Bun.file(join(root, "AGENTS.md")).text()
-      expect(first).toBeTrue()
-      expect(second).toBeFalse()
-      expect(text.match(/memory:/g)?.length).toBe(1)
-    })
-  })
-
   it("injects conductor continuation context", async () => {
     await withTmp(async (root) => {
-      await switchMode(root, "plan")
+      await switchMode(root, "conductor")
       await setStage(root, "coder")
       const text = await buildCompactionContext(root)
-      expect(text.includes("active_mode: plan")).toBeTrue()
+      expect(text.includes("active_mode: conductor")).toBeTrue()
       expect(text.includes("current_stage: coder")).toBeTrue()
     })
   })
 
-  it("creates brainstorm artifact before returning path", async () => {
+  it("builds brainstorm orchestration prompt with explicit artifact path", async () => {
     await withTmp(async (root) => {
       const out = await buildCommandPrompt(root, "brainstorm", "Idea: tighten agent prompts")
-      expect(out?.includes("I saved a brainstorm artifact at")).toBeTrue()
+      expect(out?.includes("Write the brainstorm artifact to:")).toBeTrue()
+      expect(out?.includes("@src/commands/learn.md")).toBeTrue()
       const state = await readState(root)
       expect(state.last.plan).toBeTruthy()
-      const file = join(root, ".conductor", "plans", state.last.plan as string)
-      expect(await Bun.file(file).exists()).toBeTrue()
     })
   })
 
   it("supports /branstorm typo alias", async () => {
     await withTmp(async (root) => {
       const out = await buildCommandPrompt(root, "branstorm", "Idea: typo alias")
-      expect(out?.includes("I saved a brainstorm artifact at")).toBeTrue()
+      expect(out?.includes("Write the brainstorm artifact to:")).toBeTrue()
       const state = await readState(root)
       expect(state.last.plan).toBeTruthy()
     })

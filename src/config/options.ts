@@ -1,5 +1,5 @@
 export type ConductorOptions = {
-  defaultMode?: "build" | "plan"
+  defaultMode?: "conductor"
   forceAgents?: string[]
   forceCommands?: string[]
   forceMcp?: string[]
@@ -8,7 +8,7 @@ export type ConductorOptions = {
 export function parseOptions(input?: Record<string, unknown>): ConductorOptions {
   const out: ConductorOptions = {}
   if (!input) return out
-  if (input.defaultMode === "build" || input.defaultMode === "plan") {
+  if (input.defaultMode === "conductor") {
     out.defaultMode = input.defaultMode
   }
   if (Array.isArray(input.forceAgents)) {

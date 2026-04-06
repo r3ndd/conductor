@@ -19,7 +19,3 @@ export function researchDir(root: string) {
 export function designsDir(root: string) {
   return join(conductorDir(root), "designs")
 }
-
-export function agentsPath(root: string) {
-  return join(root, "AGENTS.md")
-}

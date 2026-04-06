@@ -1,5 +1,6 @@
 import { basename, join } from "node:path"
 
+import type { Mode } from "../config/defaults"
 import { ensureDir, writeText } from "../util/fs"
 import { designsDir, plansDir, researchDir } from "./paths"
 
@@ -9,7 +10,7 @@ type Input = {
   root: string
   topic: string
   text: string
-  mode: "build" | "plan"
+  mode: Mode
   session: string
   agent: string
   command: string

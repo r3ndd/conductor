@@ -16,7 +16,7 @@ export type ConductorState = {
 }
 
 const initial: ConductorState = {
-  mode: "build",
+  mode: "conductor",
   stage: "idle",
   pending: [],
   last: {},

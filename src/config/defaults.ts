@@ -3,33 +3,20 @@ import type { AgentConfig, McpLocalConfig } from "@opencode-ai/sdk"
 import { agentPrompts } from "../agents/prompts"
 
 export const mode = {
-  build: "build",
-  plan: "plan",
+  conductor: "conductor",
 } as const
 
 export type Mode = (typeof mode)[keyof typeof mode]
 
 export const pluginAgents: Record<string, AgentConfig> = {
-  build: {
+  conductor: {
     mode: "primary",
-    description: "Default coding mode with full implementation privileges.",
-    prompt: agentPrompts.build,
+    description: "Primary Conductor orchestrator agent for command-driven multi-agent workflows.",
+    prompt: agentPrompts.conductor,
     maxSteps: 40,
     permission: {
       edit: "allow",
       bash: "allow",
-      webfetch: "allow",
-      external_directory: "ask",
-    },
-  },
-  plan: {
-    mode: "primary",
-    description: "Planning mode for decomposition, research, and design before coding.",
-    prompt: agentPrompts.plan,
-    maxSteps: 30,
-    permission: {
-      edit: "deny",
-      bash: "ask",
       webfetch: "allow",
       external_directory: "ask",
     },
@@ -50,7 +37,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
     description: "Design specialist that turns requirements into architecture decisions.",
     prompt: agentPrompts.architect,
     permission: {
-      edit: "deny",
+      edit: "allow",
       bash: "ask",
       webfetch: "allow",
       external_directory: "ask",
@@ -105,49 +92,45 @@ export const pluginAgents: Record<string, AgentConfig> = {
 }
 
 export const pluginCommands = {
-  build: {
-    description: "Switch Conductor mode to build",
-    agent: "build",
-    template: "Switch to build mode. $ARGUMENTS",
-  },
-  plan: {
-    description: "Switch Conductor mode to plan",
-    agent: "plan",
-    template: "Switch to plan mode. $ARGUMENTS",
+  conductor: {
+    description: "Switch to Conductor primary agent",
+    agent: "conductor",
+    subtask: false,
+    template: "Switch to Conductor mode. $ARGUMENTS",
   },
   brainstorm: {
     description: "Brainstorm and persist a plan artifact",
-    agent: "plan",
+    agent: "conductor",
     subtask: false,
-    template: "Brainstorm this request and persist a plan artifact: $ARGUMENTS",
+    template: "Run Conductor brainstorm workflow. $ARGUMENTS",
   },
   branstorm: {
     description: "Alias for /brainstorm (common typo)",
-    agent: "plan",
+    agent: "conductor",
     subtask: false,
-    template: "Brainstorm this request and persist a plan artifact: $ARGUMENTS",
+    template: "Run Conductor brainstorm workflow. $ARGUMENTS",
   },
   research: {
     description: "Run researcher flow and persist findings",
-    agent: "plan",
+    agent: "conductor",
     subtask: false,
-    template: "Run research workflow for: $ARGUMENTS",
+    template: "Run Conductor research workflow. $ARGUMENTS",
   },
   architect: {
     description: "Run architecture flow and persist design",
-    agent: "plan",
+    agent: "conductor",
     subtask: false,
-    template: "Run architecture workflow for: $ARGUMENTS",
+    template: "Run Conductor architecture workflow. $ARGUMENTS",
   },
   code: {
     description: "Run code pipeline (coder, reviewer, debugger, committer)",
-    agent: "build",
+    agent: "conductor",
     subtask: false,
-    template: "Run the code pipeline for: $ARGUMENTS",
+    template: "Run Conductor code pipeline workflow. $ARGUMENTS",
   },
   "conductor-doctor": {
     description: "Check Conductor setup and integrations",
-    agent: "build",
+    agent: "conductor",
     subtask: false,
     template: "Run conductor diagnostics.",
   },

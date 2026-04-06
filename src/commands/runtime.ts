@@ -1,13 +1,17 @@
-import { writeArtifact } from "../knowledge/artifacts"
-import { appendMemory } from "../knowledge/memory"
+import { join } from "node:path"
+
+import { plansDir, researchDir, designsDir } from "../knowledge/paths"
 import { readState, setLast } from "../knowledge/state"
-import { exists } from "../util/fs"
+import { ensureDir, exists } from "../util/fs"
 
-type Cmd = "build" | "plan" | "brainstorm" | "branstorm" | "research" | "architect"
+type Cmd = "conductor" | "brainstorm" | "branstorm" | "research" | "architect" | "code"
 
-function normalize(cmd: Cmd) {
+const learn = "@src/commands/learn.md"
+
+function normalize(cmd: string): Cmd | null {
   if (cmd === "branstorm") return "brainstorm"
-  return cmd
+  if (cmd === "conductor" || cmd === "brainstorm" || cmd === "research" || cmd === "architect" || cmd === "code") return cmd
+  return null
 }
 
 function topic(args: string, fallback: string) {
@@ -16,39 +20,153 @@ function topic(args: string, fallback: string) {
   return text.split("\n")[0].slice(0, 80)
 }
 
+function stamp(now = new Date()) {
+  const y = now.getUTCFullYear()
+  const m = String(now.getUTCMonth() + 1).padStart(2, "0")
+  const d = String(now.getUTCDate()).padStart(2, "0")
+  const hh = String(now.getUTCHours()).padStart(2, "0")
+  const mm = String(now.getUTCMinutes()).padStart(2, "0")
+  return `${y}-${m}-${d}-${hh}${mm}`
+}
+
+function slug(text: string) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "")
+    .slice(0, 48) || "untitled"
+}
+
+async function planPath(root: string, args: string) {
+  const name = `${stamp()}-${slug(topic(args, "brainstorm"))}-plan.md`
+  const dir = plansDir(root)
+  await ensureDir(dir)
+  return join(dir, name)
+}
+
+async function researchPath(root: string, args: string) {
+  const name = `${stamp()}-${slug(topic(args, "research"))}-research.md`
+  const dir = researchDir(root)
+  await ensureDir(dir)
+  return join(dir, name)
+}
+
+async function designPath(root: string, args: string) {
+  const name = `${stamp()}-${slug(topic(args, "design"))}-design.md`
+  const dir = designsDir(root)
+  await ensureDir(dir)
+  return join(dir, name)
+}
+
+async function remember(root: string, key: "plan" | "research" | "design", path: string) {
+  await setLast(root, key, path.split("/").at(-1) ?? path)
+}
+
+function pipelinePrompt(args: string) {
+  const goal = args.trim() || "No additional detail provided."
+  return [
+    "You are the Conductor primary orchestrator.",
+    "Run a visible subagent pipeline in this exact order: coder -> reviewer -> debugger (only if reviewer reports failures) -> committer.",
+    "Do not run hidden background sessions yourself. Use native subagent invocation so the UI shows each stage.",
+    "",
+    "For each stage:",
+    "1. Invoke that subagent with a task-specific goal.",
+    "2. After the subagent finishes, invoke a learn step using this prompt file reference:",
+    `   ${learn}`,
+    "3. Then ask the same subagent for a compact handoff summary in markdown with sections:",
+    "   - Outcome",
+    "   - Files touched",
+    "   - Tests/validation",
+    "   - Risks/open issues",
+    "   - Next-stage briefing",
+    "4. Use the handoff summary as explicit context for the next stage.",
+    "",
+    `Pipeline goal: ${goal}`,
+    "",
+    "Return a final orchestration report with each stage result and handoff summary.",
+  ].join("\n")
+}
+
+function researchPrompt(args: string, file: string) {
+  const goal = args.trim() || "Investigate the project context and produce useful findings."
+  return [
+    "You are the Conductor primary orchestrator.",
+    "Invoke the researcher subagent and manage a full handoff cycle.",
+    "",
+    `Research goal: ${goal}`,
+    "",
+    "After researcher output:",
+    "- Run the learn step using:",
+    `  ${learn}`,
+    "- Ask researcher for a compact final summary suitable for future handoff.",
+    `- Write the final research artifact to: ${file}`,
+    "",
+    "Return a concise completion note including the artifact path.",
+  ].join("\n")
+}
+
+function architectPrompt(args: string, file: string) {
+  const goal = args.trim() || "Create a design proposal based on project goals."
+  return [
+    "You are the Conductor primary orchestrator.",
+    "Invoke the architect subagent and manage a full handoff cycle.",
+    "",
+    `Architecture goal: ${goal}`,
+    "",
+    "After architect output:",
+    "- Run the learn step using:",
+    `  ${learn}`,
+    "- Ask architect for a compact final summary suitable for future handoff.",
+    `- Write the final design artifact to: ${file}`,
+    "",
+    "Return a concise completion note including the artifact path.",
+  ].join("\n")
+}
+
+function brainstormPrompt(args: string, file: string) {
+  const goal = args.trim() || "Brainstorm implementation options and tradeoffs."
+  return [
+    "You are the Conductor primary orchestrator.",
+    "Run a brainstorming flow and persist the result.",
+    "",
+    `Brainstorm goal: ${goal}`,
+    `Write the brainstorm artifact to: ${file}`,
+    "",
+    "Then run the learn step using:",
+    learn,
+    "",
+    "Return a concise completion note including the artifact path.",
+  ].join("\n")
+}
+
 export async function buildCommandPrompt(root: string, cmd: string, args: string) {
   const state = await readState(root)
-  const name = normalize(cmd as Cmd)
-  if (name === "build") {
-    return "Conductor mode is now build. Continue with implementation-oriented work."
-  }
-  if (name === "plan") {
-    return "Conductor mode is now plan. Focus on planning, research, and architecture."
+  const name = normalize(cmd)
+  if (!name) return null
+  if (name === "conductor") {
+    return "Conductor is now active as your primary orchestrator. Use /brainstorm, /research, /architect, or /code to run structured workflows."
   }
   if (name === "brainstorm") {
-    const note = `Brainstorm request: ${args.trim() || "(none)"}`
-    const file = await writeArtifact("plan", {
-      root,
-      topic: topic(args, "brainstorm"),
-      text: `# Brainstorm\n\n${note}`,
-      mode: state.mode,
-      session: "command",
-      agent: "plan",
-      command: "/brainstorm",
-    })
-    await setLast(root, "plan", file.id)
-    await appendMemory(root, `Saved brainstorm artifact ${file.id}.`)
-    const ready = await exists(file.path)
-    const status = ready
-      ? `I saved a brainstorm artifact at ${file.path}.`
-      : `The brainstorm artifact target is ${file.path}, but the file is not created yet.`
-    return `${status} Continue refining this plan with the user.`
+    const file = await planPath(root, args)
+    await remember(root, "plan", file)
+    const ready = await exists(file)
+    const note = ready ? "" : "The artifact file may not exist yet; create it as part of your response.\n"
+    return `${note}${brainstormPrompt(args, file)}\n\nCurrent Conductor state mode: ${state.mode}`
   }
   if (name === "research") {
-    return `Run researcher subagent behavior for this request and include results: ${args || "(none)"}.`
+    const file = await researchPath(root, args)
+    await remember(root, "research", file)
+    return `${researchPrompt(args, file)}\n\nCurrent Conductor state mode: ${state.mode}`
   }
   if (name === "architect") {
-    return `Run architect subagent behavior for this request and provide a detailed design: ${args || "(none)"}.`
+    const file = await designPath(root, args)
+    await remember(root, "design", file)
+    return `${architectPrompt(args, file)}\n\nCurrent Conductor state mode: ${state.mode}`
+  }
+  if (name === "code") {
+    return `${pipelinePrompt(args)}\n\nCurrent Conductor state mode: ${state.mode}`
   }
   return null
 }

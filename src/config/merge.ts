@@ -89,7 +89,7 @@ export function mergeConfig(cfg: Config, input: Input): MergeReport {
   const skippedAgent = mergeAgents(cfg, input.agents)
   const skippedCommand = mergeCommands(cfg, input.commands)
   const skippedMcp = mergeMcp(cfg, input.mcp)
-  const mode = input.opt.defaultMode ?? "build"
+  const mode = input.opt.defaultMode ?? "conductor"
   if (cfg.agent?.[mode]) {
     cfg.agent[mode] = {
       ...cfg.agent[mode],

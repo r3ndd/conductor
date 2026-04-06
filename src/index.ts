@@ -11,8 +11,6 @@ import { buildCompactionContext } from "./knowledge/compact"
 import { readState, switchMode } from "./knowledge/state"
 import { buildMcpDefaults } from "./integrations/mcp"
 import { doctor } from "./integrations/doctor"
-import { runCodePipeline } from "./orchestration/pipeline"
-import { runArchitect, runResearch } from "./orchestration/plan-flows"
 import { createConductorTool } from "./tools/conductor-control"
 import { log } from "./util/log"
 
@@ -67,7 +65,7 @@ const server: Plugin = async (ctx, raw) => {
   await log(ctx, "info", "Conductor plugin initialized", {
     directory: ctx.directory,
     mode: state.mode,
-    defaultMode: opt.defaultMode ?? "build",
+    defaultMode: opt.defaultMode ?? "conductor",
   })
   await logPromptIssues(ctx)
 
@@ -94,27 +92,12 @@ const server: Plugin = async (ctx, raw) => {
     },
     "command.execute.before": async (input, output) => {
       const name = cmdName(input.command)
-      if (name === "build") {
-        await switchMode(ctx.worktree, "build")
-      }
-      if (name === "plan") {
-        await switchMode(ctx.worktree, "plan")
-      }
-      if (name === "code") {
-        output.parts = [textPart(await runCodePipeline(ctx, input.sessionID, input.arguments))]
-        return
-      }
       if (name === "conductor-doctor") {
         output.parts = [textPart(await doctor(ctx.worktree, runtime))]
         return
       }
-      if (name === "research") {
-        output.parts = [textPart(await runResearch(ctx, input.sessionID, input.arguments))]
-        return
-      }
-      if (name === "architect") {
-        output.parts = [textPart(await runArchitect(ctx, input.sessionID, input.arguments))]
-        return
+      if (name === "conductor" || name === "brainstorm" || name === "branstorm" || name === "research" || name === "architect" || name === "code") {
+        await switchMode(ctx.worktree, "conductor")
       }
       const text = await buildCommandPrompt(ctx.worktree, name, input.arguments)
       if (!text) return
