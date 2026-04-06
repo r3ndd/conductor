@@ -8,18 +8,21 @@ export const mode = {
 
 export type Mode = (typeof mode)[keyof typeof mode]
 
+const conductorPermission = {
+  edit: "allow",
+  bash: "allow",
+  webfetch: "allow",
+  question: "allow",
+  external_directory: "ask",
+} as AgentConfig["permission"] & { question: "allow" }
+
 export const pluginAgents: Record<string, AgentConfig> = {
   conductor: {
     mode: "primary",
     description: "Primary Conductor orchestrator agent for command-driven multi-agent workflows.",
     prompt: agentPrompts.conductor,
     maxSteps: 40,
-    permission: {
-      edit: "allow",
-      bash: "allow",
-      webfetch: "allow",
-      external_directory: "ask",
-    },
+    permission: conductorPermission,
   },
   researcher: {
     mode: "subagent",
@@ -50,7 +53,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
     permission: {
       edit: "allow",
       bash: "allow",
-      webfetch: "ask",
+      webfetch: "allow",
       external_directory: "ask",
     },
   },
@@ -61,7 +64,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
     permission: {
       edit: "allow",
       bash: "allow",
-      webfetch: "ask",
+      webfetch: "allow",
       external_directory: "ask",
     },
   },
@@ -72,7 +75,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
     permission: {
       edit: "allow",
       bash: "allow",
-      webfetch: "ask",
+      webfetch: "allow",
       external_directory: "ask",
     },
   },
@@ -86,7 +89,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
         git: "allow",
       },
       webfetch: "deny",
-      external_directory: "ask",
+      external_directory: "deny",
     },
   },
 }

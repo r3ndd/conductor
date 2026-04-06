@@ -70,9 +70,9 @@ OPENAI_API_KEY=... docker compose -f docker-compose.yml run --rm opencode-plugin
 
 ## Codanna note
 
-This image does not install `codanna` by default. That is intentional for diagnostics-first testing.
+This image installs `codanna` so it is immediately available to OpenCode.
 
-Your plugin should surface this via `/conductor-doctor` when Codanna is absent.
+Your plugin should still surface `/conductor-doctor` for runtime/config issues.
 
 ## Home paths in container
 

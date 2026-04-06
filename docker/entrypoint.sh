@@ -3,6 +3,9 @@ set -euo pipefail
 
 mkdir -p "${HOME}/.config/opencode"
 mkdir -p "${HOME}/.cache/opencode"
+mkdir -p "${HOME}/text-editor-project"
+
+cd "${HOME}/text-editor-project"
 
 if [ ! -f "${HOME}/.config/opencode/opencode.json" ] || [ "${CONDUCTOR_FORCE_CONFIG_SYNC:-0}" = "1" ]; then
   if [ -f "/workspace/docker/opencode.json" ]; then

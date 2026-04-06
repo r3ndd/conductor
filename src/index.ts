@@ -11,6 +11,7 @@ import { buildCompactionContext } from "./knowledge/compact"
 import { readState, switchMode } from "./knowledge/state"
 import { buildMcpDefaults } from "./integrations/mcp"
 import { doctor } from "./integrations/doctor"
+import { installLearnSkill } from "./skills/learn"
 import { createConductorTool } from "./tools/conductor-control"
 import { log } from "./util/log"
 
@@ -39,6 +40,13 @@ async function logPromptIssues(ctx: Parameters<typeof log>[0]) {
       tried: issue.tried,
       fix: `Add or fix src/agents/prompts/${issue.agent}.md to include non-empty prompt body after frontmatter.`,
     })
+  }
+}
+
+type ConfigWithSkills = Config & {
+  skills?: {
+    paths?: string[]
+    urls?: string[]
   }
 }
 
@@ -74,6 +82,10 @@ const server: Plugin = async (ctx, raw) => {
       conductor_control: createConductorTool(ctx),
     },
     config: async (cfg) => {
+      const next = cfg as ConfigWithSkills
+      const skillPath = await installLearnSkill(ctx.worktree)
+      next.skills = { ...(next.skills ?? {}) }
+      next.skills.paths = [...new Set([...(next.skills.paths ?? []), skillPath])]
       const report = mergeConfig(cfg, {
         opt,
         agents,
@@ -93,15 +105,15 @@ const server: Plugin = async (ctx, raw) => {
     "command.execute.before": async (input, output) => {
       const name = cmdName(input.command)
       if (name === "conductor-doctor") {
-        output.parts = [textPart(await doctor(ctx.worktree, runtime))]
+        output.parts.splice(0, output.parts.length, textPart(await doctor(ctx.worktree, runtime)))
         return
       }
-      if (name === "conductor" || name === "brainstorm" || name === "research" || name === "architect" || name === "code") {
+      if (name === "brainstorm" || name === "research" || name === "architect" || name === "code") {
         await switchMode(ctx.worktree, "conductor")
       }
       const text = await buildCommandPrompt(ctx.worktree, name, input.arguments)
       if (!text) return
-      output.parts = [textPart(text)]
+      output.parts.splice(0, output.parts.length, textPart(text))
     },
     "experimental.session.compacting": async (_input, output) => {
       output.context.push(await buildCompactionContext(ctx.worktree))

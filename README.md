@@ -37,7 +37,7 @@ Conductor ships built-in agent prompt markdown files in `src/agents/prompts/` an
 - Conductor no longer overrides native `build` and `plan` agents.
 - Command workflows inject an explicit orchestration prompt in `command.execute.before`.
 - Subagent work is delegated visibly through native subagent/task flow, not hidden plugin-created sessions.
-- Subagent learn extraction is prompted via `@src/commands/learn.md`.
+- Subagent learn extraction is prompted via built-in `/conductor-learn` skill command.
 - `.conductor/state.json` stores active mode, pipeline stage, pending steps, and latest artifact ids.
 - Config merge is non-destructive by default: user-defined commands, agents, and MCP keys are preserved.
 

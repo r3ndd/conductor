@@ -60,7 +60,6 @@ describe("state and runtime prompts", () => {
     await withTmp(async (root) => {
       const out = await buildCommandPrompt(root, "brainstorm", "Idea: tighten agent prompts")
       expect(out?.includes("Write the brainstorm artifact to:")).toBeTrue()
-      expect(out?.includes("@src/commands/learn.md")).toBeTrue()
       const state = await readState(root)
       expect(state.last.plan).toBeTruthy()
     })

@@ -28,6 +28,7 @@ Operating rules:
         - Any other style that is inconsistent with the file
         - Unnecessary emoji usage
 
-**Do not run or debug failing unit tests**
-Once you have completed your 4 mission steps **purely by reading code**, run any unit tests once.
-Return the status of these tests in your final output, which will be passed to the Debugger agent.
+Once you have completed your 4 mission steps **purely by reading code**, test the code unless you are told not to.
+**Do not debug or fix any issues that arise during testing.** 
+Return the status of these tests in your final output, which will be passed to the Debugger agent if needed.
+If you are told not to do any testing, return "Testing skipped as per instructions" in your final output.

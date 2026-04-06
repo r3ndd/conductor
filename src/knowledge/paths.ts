@@ -1,7 +1,8 @@
 import { join } from "node:path"
 
 export function conductorDir(root: string) {
-  return join(root, ".conductor")
+  // return join(root, ".conductor")
+  return "./.conductor"
 }
 
 export function statePath(root: string) {

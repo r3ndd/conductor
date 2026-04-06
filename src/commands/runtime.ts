@@ -4,12 +4,10 @@ import { plansDir, researchDir, designsDir } from "../knowledge/paths"
 import { readState, setLast } from "../knowledge/state"
 import { ensureDir, exists } from "../util/fs"
 
-type Cmd = "conductor" | "brainstorm" | "research" | "architect" | "code"
-
-const learn = "@src/commands/learn.md"
+type Cmd = "brainstorm" | "research" | "architect" | "code"
 
 function normalize(cmd: string): Cmd | null {
-  if (cmd === "conductor" || cmd === "brainstorm" || cmd === "research" || cmd === "architect" || cmd === "code") return cmd
+  if (cmd === "brainstorm" || cmd === "research" || cmd === "architect" || cmd === "code") return cmd
   return null
 }
 
@@ -66,21 +64,21 @@ async function remember(root: string, key: "plan" | "research" | "design", path:
 function pipelinePrompt(args: string) {
   const goal = args.trim() || "No additional detail provided."
   return [
-    "You are the Conductor primary orchestrator.",
     "Run a visible subagent pipeline in this exact order: coder -> reviewer -> debugger (only if reviewer reports failures) -> committer.",
-    "Do not run hidden background sessions yourself. Use native subagent invocation so the UI shows each stage.",
     "",
     "For each stage:",
-    "1. Invoke that subagent with a task-specific goal.",
-    "2. After the subagent finishes, invoke a learn step using this prompt file reference:",
-    `   ${learn}`,
-    "3. Then ask the same subagent for a compact handoff summary in markdown with sections:",
+    "1. Invoke that subagent with a task-specific goal and the final summary from the previous subagent.",
+    "2. Be sure to tell it to provide a compact handoff summary in markdown with sections:",
     "   - Outcome",
     "   - Files touched",
-    "   - Tests/validation",
-    "   - Risks/open issues",
+    "   - Commands run",
     "   - Next-stage briefing",
-    "4. Use the handoff summary as explicit context for the next stage.",
+    "3. After the subagent finishes, tell it to run the /conductor-learn skill (ignore its output after this).",
+    "4. Use the handoff summary as explicit context for the next subagent stage.",
+    "",
+    "Important:",
+    "- The coder should not run, test, or debug its code. It only writes code.",
+    "- The reviewer does not debug code. It only reads the code and makes changes as needed. When it is done it runs any tests and tells you if the Debugger agent is needed or should be skipped.",
     "",
     `Pipeline goal: ${goal}`,
     "",
@@ -91,50 +89,39 @@ function pipelinePrompt(args: string) {
 function researchPrompt(args: string, file: string) {
   const goal = args.trim() || "Investigate the project context and produce useful findings."
   return [
-    "You are the Conductor primary orchestrator.",
     "Invoke the researcher subagent and manage a full handoff cycle.",
+    `Tell it to write the final research artifact to: ${file}`,
+    "Also tell it to provide a compact final summary suitable for future handoff.",
     "",
     `Research goal: ${goal}`,
     "",
-    "After researcher output:",
-    "- Run the learn step using:",
-    `  ${learn}`,
-    "- Ask researcher for a compact final summary suitable for future handoff.",
-    `- Write the final research artifact to: ${file}`,
+    "After researcher finishes, tell it to run the /conductor-learn skill (ignore its output after this).",
     "",
-    "Return a concise completion note including the artifact path.",
+    "Return a concise completion note including the research artifact path.",
   ].join("\n")
 }
 
 function architectPrompt(args: string, file: string) {
   const goal = args.trim() || "Create a design proposal based on project goals."
   return [
-    "You are the Conductor primary orchestrator.",
     "Invoke the architect subagent and manage a full handoff cycle.",
+    "Be sure to pass it any relevant brainstorm artifact file paths.",
     "",
     `Architecture goal: ${goal}`,
     "",
-    "After architect output:",
-    "- Run the learn step using:",
-    `  ${learn}`,
-    "- Ask architect for a compact final summary suitable for future handoff.",
-    `- Write the final design artifact to: ${file}`,
-    "",
-    "Return a concise completion note including the artifact path.",
+    "Return a concise completion note including the design artifact path the subagent gives you.",
   ].join("\n")
 }
 
 function brainstormPrompt(args: string, file: string) {
   const goal = args.trim() || "Brainstorm implementation options and tradeoffs."
   return [
-    "You are the Conductor primary orchestrator.",
     "Run a brainstorming flow and persist the result.",
+    "Work with the user directly and do not invoke any subagents.",
+    "Use the `question` tool to ask brainstorming questions to the user.",
     "",
     `Brainstorm goal: ${goal}`,
     `Write the brainstorm artifact to: ${file}`,
-    "",
-    "Then run the learn step using:",
-    learn,
     "",
     "Return a concise completion note including the artifact path.",
   ].join("\n")

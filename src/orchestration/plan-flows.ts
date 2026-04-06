@@ -3,7 +3,7 @@ export function planContract(goal: string) {
     "Conductor planning contract:",
     `- Goal: ${goal || "(none)"}`,
     "- Invoke target subagent visibly",
-    "- Run learn extraction via @src/commands/learn.md",
+    "- Run learn extraction via /conductor-learn",
     "- Produce compact handoff summary",
   ].join("\n")
 }
