@@ -1,5 +1,7 @@
 import type { AgentConfig, McpLocalConfig } from "@opencode-ai/sdk"
 
+import { agentPrompts } from "../agents/prompts"
+
 export const mode = {
   build: "build",
   plan: "plan",
@@ -11,6 +13,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
   build: {
     mode: "primary",
     description: "Default coding mode with full implementation privileges.",
+    prompt: agentPrompts.build,
     maxSteps: 40,
     permission: {
       edit: "allow",
@@ -22,6 +25,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
   plan: {
     mode: "primary",
     description: "Planning mode for decomposition, research, and design before coding.",
+    prompt: agentPrompts.plan,
     maxSteps: 30,
     permission: {
       edit: "deny",
@@ -33,6 +37,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
   researcher: {
     mode: "subagent",
     description: "Research-focused specialist for external and codebase discovery.",
+    prompt: agentPrompts.researcher,
     permission: {
       edit: "deny",
       bash: "ask",
@@ -43,6 +48,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
   architect: {
     mode: "subagent",
     description: "Design specialist that turns requirements into architecture decisions.",
+    prompt: agentPrompts.architect,
     permission: {
       edit: "deny",
       bash: "ask",
@@ -53,6 +59,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
   coder: {
     mode: "subagent",
     description: "Implementation specialist for code changes and refactors.",
+    prompt: agentPrompts.coder,
     permission: {
       edit: "allow",
       bash: "allow",
@@ -63,6 +70,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
   reviewer: {
     mode: "subagent",
     description: "Quality specialist for review, tests, and requirement validation.",
+    prompt: agentPrompts.reviewer,
     permission: {
       edit: "allow",
       bash: "allow",
@@ -73,6 +81,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
   debugger: {
     mode: "subagent",
     description: "Failure-analysis specialist to fix failing tests or runtime issues.",
+    prompt: agentPrompts.debugger,
     permission: {
       edit: "allow",
       bash: "allow",
@@ -83,6 +92,7 @@ export const pluginAgents: Record<string, AgentConfig> = {
   committer: {
     mode: "subagent",
     description: "Commit specialist that prepares a safe commit action summary.",
+    prompt: agentPrompts.committer,
     permission: {
       edit: "allow",
       bash: {

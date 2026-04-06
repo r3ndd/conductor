@@ -21,6 +21,8 @@ Then add the plugin to `opencode.json`:
 
 No extra agent or command files are required.
 
+Conductor ships built-in agent prompt markdown files in `src/agents/prompts/` and loads them into plugin agent config at runtime.
+
 ## Commands
 
 - `/build`: switch active Conductor mode to `build`
@@ -44,6 +46,32 @@ No extra agent or command files are required.
 - `plan` primary agent: read-first posture (`edit` denied, `webfetch` allowed).
 - Subagents are least-privilege by role.
 - `committer` only grants `bash.git` and does not auto-push.
+
+## Agent prompt files
+
+Conductor agent prompts are defined as markdown files with YAML frontmatter and markdown body:
+
+- `src/agents/prompts/build.md`
+- `src/agents/prompts/plan.md`
+- `src/agents/prompts/researcher.md`
+- `src/agents/prompts/architect.md`
+- `src/agents/prompts/coder.md`
+- `src/agents/prompts/reviewer.md`
+- `src/agents/prompts/debugger.md`
+- `src/agents/prompts/committer.md`
+
+Format follows OpenCode agent markdown conventions:
+
+```md
+---
+description: Short agent description
+mode: subagent
+---
+
+System prompt content here.
+```
+
+Conductor strips frontmatter and assigns the markdown body to each agent's `prompt` field in `src/config/defaults.ts`.
 
 ## MCP integrations
 

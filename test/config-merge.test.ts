@@ -42,4 +42,10 @@ describe("mergeConfig", () => {
     expect(cfg.command?.build?.template).toBe(pluginCommands.build.template)
     expect((cfg.mcp?.context7 as { command: string[] }).command[0]).toBe("npx")
   })
+
+  it("loads markdown prompts into agent config", () => {
+    expect(pluginAgents.build.prompt).toContain("You are Conductor's build agent.")
+    expect(pluginAgents.plan.prompt).toContain("You are Conductor's plan agent.")
+    expect(pluginAgents.reviewer.prompt).toContain("You are the reviewer subagent.")
+  })
 })
