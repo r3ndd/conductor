@@ -1,8 +1,14 @@
 import { writeArtifact } from "../knowledge/artifacts"
 import { appendMemory } from "../knowledge/memory"
 import { readState, setLast } from "../knowledge/state"
+import { exists } from "../util/fs"
 
-type Cmd = "build" | "plan" | "brainstorm" | "research" | "architect"
+type Cmd = "build" | "plan" | "brainstorm" | "branstorm" | "research" | "architect"
+
+function normalize(cmd: Cmd) {
+  if (cmd === "branstorm") return "brainstorm"
+  return cmd
+}
 
 function topic(args: string, fallback: string) {
   const text = args.trim()
@@ -12,7 +18,7 @@ function topic(args: string, fallback: string) {
 
 export async function buildCommandPrompt(root: string, cmd: string, args: string) {
   const state = await readState(root)
-  const name = cmd as Cmd
+  const name = normalize(cmd as Cmd)
   if (name === "build") {
     return "Conductor mode is now build. Continue with implementation-oriented work."
   }
@@ -32,7 +38,11 @@ export async function buildCommandPrompt(root: string, cmd: string, args: string
     })
     await setLast(root, "plan", file.id)
     await appendMemory(root, `Saved brainstorm artifact ${file.id}.`)
-    return `I saved a brainstorm artifact at ${file.path}. Continue refining this plan with the user.`
+    const ready = await exists(file.path)
+    const status = ready
+      ? `I saved a brainstorm artifact at ${file.path}.`
+      : `The brainstorm artifact target is ${file.path}, but the file is not created yet.`
+    return `${status} Continue refining this plan with the user.`
   }
   if (name === "research") {
     return `Run researcher subagent behavior for this request and include results: ${args || "(none)"}.`

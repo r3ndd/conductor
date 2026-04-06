@@ -5,31 +5,42 @@ const promptRoot = [
   new URL("../src/agents/prompts/", import.meta.url),
 ]
 
+const names = ["build", "plan", "researcher", "architect", "coder", "reviewer", "debugger", "committer"] as const
+
+type PromptName = (typeof names)[number]
+
+export type PromptIssue = {
+  agent: PromptName
+  reason: "missing" | "empty"
+  tried: string[]
+}
+
 function strip(text: string) {
   const match = text.match(/^---\n[\s\S]*?\n---\n?/)
   if (!match) return text.trim()
   return text.slice(match[0].length).trim()
 }
 
-function load(name: string) {
+function load(name: PromptName) {
+  const tried: string[] = []
   for (const root of promptRoot) {
     try {
       const file = new URL(`${name}.md`, root)
-      return strip(readFileSync(file, "utf8"))
+      tried.push(file.pathname)
+      const text = strip(readFileSync(file, "utf8"))
+      if (!text) {
+        return { text: "", issue: { agent: name, reason: "empty", tried } as PromptIssue }
+      }
+      return { text, issue: null }
     } catch {
       continue
     }
   }
-  return ""
+  return { text: "", issue: { agent: name, reason: "missing", tried } as PromptIssue }
 }
 
-export const agentPrompts = {
-  build: load("build"),
-  plan: load("plan"),
-  researcher: load("researcher"),
-  architect: load("architect"),
-  coder: load("coder"),
-  reviewer: load("reviewer"),
-  debugger: load("debugger"),
-  committer: load("committer"),
-} as const
+const loaded = names.map((name) => [name, load(name)] as const)
+
+export const agentPrompts = Object.fromEntries(loaded.map(([name, out]) => [name, out.text])) as Record<PromptName, string>
+
+export const agentPromptIssues = loaded.flatMap(([, out]) => (out.issue ? [out.issue] : []))

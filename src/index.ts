@@ -2,6 +2,7 @@ import type { Config, Plugin, PluginModule } from "@opencode-ai/plugin"
 import type { Part } from "@opencode-ai/sdk"
 
 import { agents } from "./agents/index"
+import { agentPromptIssues } from "./agents/prompts"
 import { commands } from "./commands/index"
 import { buildCommandPrompt } from "./commands/runtime"
 import { mergeConfig } from "./config/merge"
@@ -32,6 +33,17 @@ async function logConfig(ctx: Parameters<typeof log>[0], cfg: Config) {
   })
 }
 
+async function logPromptIssues(ctx: Parameters<typeof log>[0]) {
+  for (const issue of agentPromptIssues) {
+    await log(ctx, "warn", "Conductor agent prompt markdown issue", {
+      agent: issue.agent,
+      reason: issue.reason,
+      tried: issue.tried,
+      fix: `Add or fix src/agents/prompts/${issue.agent}.md to include non-empty prompt body after frontmatter.`,
+    })
+  }
+}
+
 async function logCollisions(ctx: Parameters<typeof log>[0], report: { skipped: { agent: string[]; command: string[]; mcp: string[] } }) {
   const entries = [
     ["agent", report.skipped.agent],
@@ -57,6 +69,7 @@ const server: Plugin = async (ctx, raw) => {
     mode: state.mode,
     defaultMode: opt.defaultMode ?? "build",
   })
+  await logPromptIssues(ctx)
 
   return {
     tool: {

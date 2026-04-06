@@ -4,6 +4,7 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 
 import { writeArtifact } from "../src/knowledge/artifacts"
+import { buildCommandPrompt } from "../src/commands/runtime"
 import { appendMemory } from "../src/knowledge/memory"
 import { buildCompactionContext } from "../src/knowledge/compact"
 import { readState, setStage, switchMode } from "../src/knowledge/state"
@@ -64,6 +65,26 @@ describe("state, artifacts, and memory", () => {
       const text = await buildCompactionContext(root)
       expect(text.includes("active_mode: plan")).toBeTrue()
       expect(text.includes("current_stage: coder")).toBeTrue()
+    })
+  })
+
+  it("creates brainstorm artifact before returning path", async () => {
+    await withTmp(async (root) => {
+      const out = await buildCommandPrompt(root, "brainstorm", "Idea: tighten agent prompts")
+      expect(out?.includes("I saved a brainstorm artifact at")).toBeTrue()
+      const state = await readState(root)
+      expect(state.last.plan).toBeTruthy()
+      const file = join(root, ".conductor", "plans", state.last.plan as string)
+      expect(await Bun.file(file).exists()).toBeTrue()
+    })
+  })
+
+  it("supports /branstorm typo alias", async () => {
+    await withTmp(async (root) => {
+      const out = await buildCommandPrompt(root, "branstorm", "Idea: typo alias")
+      expect(out?.includes("I saved a brainstorm artifact at")).toBeTrue()
+      const state = await readState(root)
+      expect(state.last.plan).toBeTruthy()
     })
   })
 })

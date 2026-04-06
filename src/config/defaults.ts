@@ -121,6 +121,12 @@ export const pluginCommands = {
     subtask: false,
     template: "Brainstorm this request and persist a plan artifact: $ARGUMENTS",
   },
+  branstorm: {
+    description: "Alias for /brainstorm (common typo)",
+    agent: "plan",
+    subtask: false,
+    template: "Brainstorm this request and persist a plan artifact: $ARGUMENTS",
+  },
   research: {
     description: "Run researcher flow and persist findings",
     agent: "plan",

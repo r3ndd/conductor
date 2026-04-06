@@ -28,6 +28,7 @@ Conductor ships built-in agent prompt markdown files in `src/agents/prompts/` an
 - `/build`: switch active Conductor mode to `build`
 - `/plan`: switch active Conductor mode to `plan`
 - `/brainstorm [prompt]`: persist a planning artifact in `.conductor/plans/`
+- `/branstorm [prompt]`: alias for `/brainstorm` (common typo)
 - `/research [prompt]`: run the researcher subagent and persist `.conductor/research/`
 - `/architect [prompt]`: run the architect subagent and persist `.conductor/designs/`
 - `/code [prompt]`: run the coding pipeline (`coder -> reviewer -> debugger if needed -> committer`)
@@ -72,6 +73,7 @@ System prompt content here.
 ```
 
 Conductor strips frontmatter and assigns the markdown body to each agent's `prompt` field in `src/config/defaults.ts`.
+At startup, Conductor warns in logs if any expected prompt file is missing or has an empty body.
 
 ## MCP integrations
 

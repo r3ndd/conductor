@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test"
 
 import type { Config } from "@opencode-ai/plugin"
 
+import { agentPromptIssues } from "../src/agents/prompts"
 import { pluginAgents, pluginCommands, pluginMcp } from "../src/config/defaults"
 import { mergeConfig } from "../src/config/merge"
 
@@ -44,6 +45,7 @@ describe("mergeConfig", () => {
   })
 
   it("loads markdown prompts into agent config", () => {
+    expect(agentPromptIssues.length).toBe(0)
     expect(pluginAgents.build.prompt).toContain("You are Conductor's build agent.")
     expect(pluginAgents.plan.prompt).toContain("You are Conductor's plan agent.")
     expect(pluginAgents.reviewer.prompt).toContain("You are the reviewer subagent.")

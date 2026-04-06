@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises"
+import { access, mkdir, readFile, writeFile } from "node:fs/promises"
 
 export async function ensureDir(path: string) {
   await mkdir(path, { recursive: true })
@@ -22,6 +22,15 @@ export async function writeText(path: string, text: string) {
 
 export async function writeJson(path: string, value: unknown) {
   await writeText(path, `${JSON.stringify(value, null, 2)}\n`)
+}
+
+export async function exists(path: string) {
+  try {
+    await access(path)
+    return true
+  } catch {
+    return false
+  }
 }
 
 export async function readJsonOr<T>(path: string, fallback: T): Promise<T> {
