@@ -3,7 +3,7 @@ import { describe, expect, it } from "bun:test"
 import type { Config } from "@opencode-ai/plugin"
 
 import { agentPromptIssues } from "../src/agents/prompts"
-import { pluginAgents, pluginCommands, pluginMcp } from "../src/config/defaults"
+import { buildPluginAgents, pluginAgents, pluginCommands, pluginMcp } from "../src/config/defaults"
 import { mergeConfig } from "../src/config/merge"
 
 describe("mergeConfig", () => {
@@ -52,5 +52,11 @@ describe("mergeConfig", () => {
 
   it("allows the question tool for the conductor agent", () => {
     expect((pluginAgents.conductor.permission as { question?: string }).question).toBe("allow")
+  })
+
+  it("keeps default model behavior when no override is set", () => {
+    const agents = buildPluginAgents()
+    expect(agents.conductor.model).toBeUndefined()
+    expect(agents.reviewer.model).toBeUndefined()
   })
 })

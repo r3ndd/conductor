@@ -5,8 +5,10 @@ import { agents } from "./agents/index"
 import { agentPromptIssues } from "./agents/prompts"
 import { commands } from "./commands/index"
 import { buildCommandPrompt } from "./commands/runtime"
+import { buildPluginAgents } from "./config/defaults"
 import { mergeConfig } from "./config/merge"
 import { parseOptions } from "./config/options"
+import { loadConductorSettings } from "./config/user-settings"
 import { buildCompactionContext } from "./knowledge/compact"
 import { readState, switchMode } from "./knowledge/state"
 import { buildMcpDefaults } from "./integrations/mcp"
@@ -69,12 +71,19 @@ async function logCollisions(ctx: Parameters<typeof log>[0], report: { skipped: 
 const server: Plugin = async (ctx, raw) => {
   const opt = parseOptions(raw)
   const state = await readState(ctx.worktree)
+  const settings = await loadConductorSettings()
+  const userAgents = buildPluginAgents(settings.models)
   let runtime: Config = {}
   await log(ctx, "info", "Conductor plugin initialized", {
     directory: ctx.directory,
     mode: state.mode,
     defaultMode: opt.defaultMode ?? "conductor",
+    settingsPath: settings.path,
+    modelOverrides: Object.keys(settings.models),
   })
+  for (const issue of settings.issues) {
+    await log(ctx, "warn", "Conductor settings issue", { issue, path: settings.path })
+  }
   await logPromptIssues(ctx)
 
   return {
@@ -88,7 +97,7 @@ const server: Plugin = async (ctx, raw) => {
       next.skills.paths = [...new Set([...(next.skills.paths ?? []), skillPath])]
       const report = mergeConfig(cfg, {
         opt,
-        agents,
+        agents: { ...agents, ...userAgents },
         commands,
         mcp: buildMcpDefaults(),
       })

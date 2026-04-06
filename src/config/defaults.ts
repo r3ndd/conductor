@@ -8,6 +8,17 @@ export const mode = {
 
 export type Mode = (typeof mode)[keyof typeof mode]
 
+export const agentNames = ["conductor", "researcher", "architect", "coder", "reviewer", "debugger", "committer"] as const
+
+export type AgentName = (typeof agentNames)[number]
+
+export type AgentModelOverrides = Partial<Record<AgentName, string>>
+
+function applyModel(agent: AgentConfig, model?: string) {
+  if (!model) return agent
+  return { ...agent, model }
+}
+
 const conductorPermission = {
   edit: "allow",
   bash: "allow",
@@ -16,7 +27,7 @@ const conductorPermission = {
   external_directory: "ask",
 } as AgentConfig["permission"] & { question: "allow" }
 
-export const pluginAgents: Record<string, AgentConfig> = {
+const basePluginAgents: Record<AgentName, AgentConfig> = {
   conductor: {
     mode: "primary",
     description: "Primary Conductor orchestrator agent for command-driven multi-agent workflows.",
@@ -93,6 +104,15 @@ export const pluginAgents: Record<string, AgentConfig> = {
     },
   },
 }
+
+export function buildPluginAgents(models: AgentModelOverrides = {}) {
+  return Object.fromEntries(agentNames.map((name) => [name, applyModel(basePluginAgents[name], models[name])])) as Record<
+    AgentName,
+    AgentConfig
+  >
+}
+
+export const pluginAgents = buildPluginAgents()
 
 export const pluginCommands = {
   brainstorm: {

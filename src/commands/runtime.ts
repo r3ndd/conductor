@@ -136,17 +136,17 @@ export async function buildCommandPrompt(root: string, cmd: string, args: string
     await remember(root, "plan", file)
     const ready = await exists(file)
     const note = ready ? "" : "The artifact file may not exist yet; create it as part of your response.\n"
-    return `${note}${brainstormPrompt(args, file)}\n\nCurrent Conductor state mode: ${state.mode}`
+    return `${note}${brainstormPrompt(args, file)}`
   }
   if (name === "research") {
     const file = await researchPath(root, args)
     await remember(root, "research", file)
-    return `${researchPrompt(args, file)}\n\nCurrent Conductor state mode: ${state.mode}`
+    return `${researchPrompt(args, file)}`
   }
   if (name === "architect") {
     const file = await designPath(root, args)
     await remember(root, "design", file)
-    return `${architectPrompt(args, file)}\n\nCurrent Conductor state mode: ${state.mode}`
+    return `${architectPrompt(args, file)}`
   }
   if (name === "code") {
     return `${pipelinePrompt(args)}\n\nCurrent Conductor state mode: ${state.mode}`

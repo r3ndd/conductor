@@ -13,6 +13,14 @@ if [ ! -f "${HOME}/.config/opencode/opencode.json" ] || [ "${CONDUCTOR_FORCE_CON
   fi
 fi
 
+if [ ! -f "${HOME}/.config/opencode/conductor.json" ] || [ "${CONDUCTOR_FORCE_CONFIG_SYNC:-0}" = "1" ]; then
+  cat > "${HOME}/.config/opencode/conductor.json" <<'EOF'
+{
+  "models": {}
+}
+EOF
+fi
+
 if [ -n "${OPENAI_API_KEY:-}" ]; then
   export OPENAI_API_KEY
 fi

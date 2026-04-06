@@ -116,6 +116,23 @@ Conductor supports optional plugin tuple options:
 - `defaultMode`: `conductor`
 - `forceAgents`, `forceCommands`, `forceMcp`: selectively force plugin-owned keys in collisions
 
+## User settings
+
+Users can optionally create `~/.config/opencode/conductor.json` to override agent models.
+
+```json
+{
+  "models": {
+    "conductor": "opencode/gpt-5.1-codex",
+    "reviewer": "anthropic/claude-sonnet-4-20250514"
+  }
+}
+```
+
+- Supported agent keys: `Conductor`, `Researcher`, `Architect`, `Coder`, `Reviewer`, `Debugger`, `Committer`
+- Values should be OpenCode model IDs
+- Omitted agents keep the current default model behavior
+
 ## Development
 
 ```bash
