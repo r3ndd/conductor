@@ -1,0 +1,27 @@
+services:
+  opencode-plugin-dev:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: conductor-opencode-dev:latest
+    container_name: conductor-opencode-dev
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./:/workspace
+      - opencode-config:/root/.config/opencode
+      - opencode-cache:/root/.cache/opencode
+      - bun-install-cache:/root/.bun/install/cache
+      - bun-pm-cache:/root/.bun/pm/cache
+    environment:
+      - CONDUCTOR_FORCE_CONFIG_SYNC=0
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+
+volumes:
+  opencode-config:
+  opencode-cache:
+  bun-install-cache:
+  bun-pm-cache:

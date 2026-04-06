@@ -1,0 +1,36 @@
+{
+  "name": "opencode-conductor",
+  "version": "0.1.0",
+  "description": "Self-contained multi-agent orchestration plugin for OpenCode",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "typecheck": "tsc --project tsconfig.test.json --noEmit",
+    "test": "bun test",
+    "check": "bun run typecheck && bun test",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "opencode",
+    "plugin",
+    "agent",
+    "conductor"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.2.27",
+    "@opencode-ai/sdk": "^1.2.44",
+    "jsonc-parser": "^3.3.1"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "typescript": "^5.8.3"
+  }
+}
