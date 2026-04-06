@@ -92,20 +92,8 @@ export const pluginAgents: Record<string, AgentConfig> = {
 }
 
 export const pluginCommands = {
-  conductor: {
-    description: "Switch to Conductor primary agent",
-    agent: "conductor",
-    subtask: false,
-    template: "Switch to Conductor mode. $ARGUMENTS",
-  },
   brainstorm: {
     description: "Brainstorm and persist a plan artifact",
-    agent: "conductor",
-    subtask: false,
-    template: "Run Conductor brainstorm workflow. $ARGUMENTS",
-  },
-  branstorm: {
-    description: "Alias for /brainstorm (common typo)",
     agent: "conductor",
     subtask: false,
     template: "Run Conductor brainstorm workflow. $ARGUMENTS",

@@ -1,6 +1,8 @@
 # .plans/
-# .references/
+.references/
 # AGENTS.md
 # Ideas.md
+.codanna*
+.fastembed_cache*
 node_modules/
 dist/

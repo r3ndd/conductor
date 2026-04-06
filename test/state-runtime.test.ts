@@ -65,13 +65,4 @@ describe("state and runtime prompts", () => {
       expect(state.last.plan).toBeTruthy()
     })
   })
-
-  it("supports /branstorm typo alias", async () => {
-    await withTmp(async (root) => {
-      const out = await buildCommandPrompt(root, "branstorm", "Idea: typo alias")
-      expect(out?.includes("Write the brainstorm artifact to:")).toBeTrue()
-      const state = await readState(root)
-      expect(state.last.plan).toBeTruthy()
-    })
-  })
 })

@@ -4,12 +4,11 @@ import { plansDir, researchDir, designsDir } from "../knowledge/paths"
 import { readState, setLast } from "../knowledge/state"
 import { ensureDir, exists } from "../util/fs"
 
-type Cmd = "conductor" | "brainstorm" | "branstorm" | "research" | "architect" | "code"
+type Cmd = "conductor" | "brainstorm" | "research" | "architect" | "code"
 
 const learn = "@src/commands/learn.md"
 
 function normalize(cmd: string): Cmd | null {
-  if (cmd === "branstorm") return "brainstorm"
   if (cmd === "conductor" || cmd === "brainstorm" || cmd === "research" || cmd === "architect" || cmd === "code") return cmd
   return null
 }
@@ -145,9 +144,6 @@ export async function buildCommandPrompt(root: string, cmd: string, args: string
   const state = await readState(root)
   const name = normalize(cmd)
   if (!name) return null
-  if (name === "conductor") {
-    return "Conductor is now active as your primary orchestrator. Use /brainstorm, /research, /architect, or /code to run structured workflows."
-  }
   if (name === "brainstorm") {
     const file = await planPath(root, args)
     await remember(root, "plan", file)

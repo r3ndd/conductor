@@ -25,9 +25,7 @@ Conductor ships built-in agent prompt markdown files in `src/agents/prompts/` an
 
 ## Commands
 
-- `/conductor`: switch to Conductor primary agent mode
 - `/brainstorm [prompt]`: orchestrate brainstorming and persist `.conductor/plans/` artifact
-- `/branstorm [prompt]`: alias for `/brainstorm` (common typo)
 - `/research [prompt]`: orchestrate researcher flow and persist `.conductor/research/` artifact
 - `/architect [prompt]`: orchestrate architect flow and persist `.conductor/designs/` artifact
 - `/code [prompt]`: orchestrate visible pipeline (`coder -> reviewer -> debugger if needed -> committer`)
