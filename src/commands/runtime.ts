@@ -73,10 +73,11 @@ function pipelinePrompt(args: string) {
     "   - Files touched",
     "   - Commands run",
     "   - Next-stage briefing",
-    "3. After the subagent finishes, tell it to run the /conductor-learn skill (ignore its output after this).",
+    "3. After the subagent finishes, tell it to run the /conductor-learn skill.",
     "4. Use the handoff summary as explicit context for the next subagent stage.",
     "",
     "Important:",
+    "Make sure the coder and reviewer are given the paths to any relevant design or research artifacts, and make sure they read them.",
     "- The coder should not run, test, or debug its code. It only writes code.",
     "- The reviewer does not debug code. It only reads the code and makes changes as needed. When it is done it runs any tests and tells you if the Debugger agent is needed or should be skipped.",
     "",
@@ -95,7 +96,7 @@ function researchPrompt(args: string, file: string) {
     "",
     `Research goal: ${goal}`,
     "",
-    "After researcher finishes, tell it to run the /conductor-learn skill (ignore its output after this).",
+    "After researcher finishes, tell it to run the /conductor-learn skill.",
     "",
     "Return a concise completion note including the research artifact path.",
   ].join("\n")
@@ -105,7 +106,7 @@ function architectPrompt(args: string, file: string) {
   const goal = args.trim() || "Create a design proposal based on project goals."
   return [
     "Invoke the architect subagent and manage a full handoff cycle.",
-    "Be sure to pass it any relevant brainstorm artifact file paths.",
+    "Be sure to pass it any relevant brainstorm artifact file paths and make sure it reads them.",
     "",
     `Architecture goal: ${goal}`,
     "",

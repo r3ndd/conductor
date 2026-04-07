@@ -4,5 +4,6 @@
 Ideas.md
 .codanna*
 .fastembed_cache*
+.conductor/
 node_modules/
 dist/
