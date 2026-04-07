@@ -117,7 +117,7 @@ const server: Plugin = async (ctx, raw) => {
         output.parts.splice(0, output.parts.length, textPart(await doctor(ctx.worktree, runtime)))
         return
       }
-      if (name === "brainstorm" || name === "research" || name === "architect" || name === "code") {
+      if (name === "brainstorm" || name === "research" || name === "architect" || name === "code" || name === "consolidate") {
         await switchMode(ctx.worktree, "conductor")
       }
       const text = await buildCommandPrompt(ctx.worktree, name, input.arguments)

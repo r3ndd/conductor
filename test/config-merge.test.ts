@@ -48,6 +48,7 @@ describe("mergeConfig", () => {
     expect(agentPromptIssues.length).toBe(0)
     expect(pluginAgents.conductor.prompt).toContain("You are the Conductor primary agent.")
     expect(pluginAgents.reviewer.prompt).toContain("You are the reviewer subagent.")
+    expect(pluginAgents.consolidator.prompt).toContain("You are the consolidator subagent.")
   })
 
   it("allows the question tool for the conductor agent", () => {

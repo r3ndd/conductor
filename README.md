@@ -28,7 +28,8 @@ Conductor ships built-in agent prompt markdown files in `src/agents/prompts/` an
 - `/brainstorm [prompt]`: orchestrate brainstorming and persist `.conductor/plans/` artifact
 - `/research [prompt]`: orchestrate researcher flow and persist `.conductor/research/` artifact
 - `/architect [prompt]`: orchestrate architect flow and persist `.conductor/designs/` artifact
-- `/code [prompt]`: orchestrate visible pipeline (`coder -> reviewer -> debugger if needed -> committer`)
+- `/code [prompt]`: orchestrate visible pipeline (`coder -> reviewer -> debugger if needed -> consolidator -> committer`)
+- `/consolidate [prompt]`: invoke consolidator-only flow to organize AGENTS.md knowledge
 - `/conductor-doctor`: show Context7/Codanna integration diagnostics
 
 ## Behavior
@@ -58,6 +59,7 @@ Conductor agent prompts are defined as markdown files with YAML frontmatter and 
 - `src/agents/prompts/coder.md`
 - `src/agents/prompts/reviewer.md`
 - `src/agents/prompts/debugger.md`
+- `src/agents/prompts/consolidator.md`
 - `src/agents/prompts/committer.md`
 
 Format follows OpenCode agent markdown conventions:
@@ -129,7 +131,7 @@ Users can optionally create `~/.config/opencode/conductor.json` to override agen
 }
 ```
 
-- Supported agent keys: `Conductor`, `Researcher`, `Architect`, `Coder`, `Reviewer`, `Debugger`, `Committer`
+- Supported agent keys: `Conductor`, `Researcher`, `Architect`, `Coder`, `Reviewer`, `Debugger`, `Consolidator`, `Committer`
 - Values should be OpenCode model IDs
 - Omitted agents keep the current default model behavior
 

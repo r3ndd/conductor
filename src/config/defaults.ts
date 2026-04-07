@@ -8,7 +8,7 @@ export const mode = {
 
 export type Mode = (typeof mode)[keyof typeof mode]
 
-export const agentNames = ["conductor", "researcher", "architect", "coder", "reviewer", "debugger", "committer"] as const
+export const agentNames = ["conductor", "researcher", "architect", "coder", "reviewer", "debugger", "consolidator", "committer"] as const
 
 export type AgentName = (typeof agentNames)[number]
 
@@ -90,6 +90,17 @@ const basePluginAgents: Record<AgentName, AgentConfig> = {
       external_directory: "ask",
     },
   },
+  consolidator: {
+    mode: "subagent",
+    description: "Knowledge specialist that consolidates AGENTS.md learnings across project subdirectories.",
+    prompt: agentPrompts.consolidator,
+    permission: {
+      edit: "allow",
+      bash: "allow",
+      webfetch: "deny",
+      external_directory: "deny",
+    },
+  },
   committer: {
     mode: "subagent",
     description: "Commit specialist that prepares a safe commit action summary.",
@@ -134,10 +145,16 @@ export const pluginCommands = {
     template: "Run Conductor architecture workflow. $ARGUMENTS",
   },
   code: {
-    description: "Run code pipeline (coder, reviewer, debugger, committer)",
+    description: "Run code pipeline (coder, reviewer, debugger if needed, consolidator, committer)",
     agent: "conductor",
     subtask: false,
     template: "Run Conductor code pipeline workflow. $ARGUMENTS",
+  },
+  consolidate: {
+    description: "Run consolidator flow to organize AGENTS.md knowledge",
+    agent: "conductor",
+    subtask: false,
+    template: "Run Conductor consolidator workflow. $ARGUMENTS",
   },
   "conductor-doctor": {
     description: "Check Conductor setup and integrations",

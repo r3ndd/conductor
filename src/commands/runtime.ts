@@ -4,10 +4,10 @@ import { plansDir, researchDir, designsDir } from "../knowledge/paths"
 import { readState, setLast } from "../knowledge/state"
 import { ensureDir, exists } from "../util/fs"
 
-type Cmd = "brainstorm" | "research" | "architect" | "code"
+type Cmd = "brainstorm" | "research" | "architect" | "code" | "consolidate"
 
 function normalize(cmd: string): Cmd | null {
-  if (cmd === "brainstorm" || cmd === "research" || cmd === "architect" || cmd === "code") return cmd
+  if (cmd === "brainstorm" || cmd === "research" || cmd === "architect" || cmd === "code" || cmd === "consolidate") return cmd
   return null
 }
 
@@ -64,26 +64,37 @@ async function remember(root: string, key: "plan" | "research" | "design", path:
 function pipelinePrompt(args: string) {
   const goal = args.trim() || "No additional detail provided."
   return [
-    "Run a visible subagent pipeline in this exact order: coder -> reviewer -> debugger (only if reviewer reports failures) -> committer.",
+    "Run a visible subagent pipeline in this exact order: coder -> reviewer -> debugger (only if reviewer reports failures) -> consolidator -> committer.",
     "",
     "For each stage:",
-    "1. Invoke that subagent with a task-specific goal and the final summary from the previous subagent.",
-    "2. Be sure to tell it to provide a compact handoff summary in markdown with sections:",
+    "1. Invoke that subagent with a task-specific goal and the final summary from the previous subagent (except the consolidator).",
+    "2. Be sure to tell it to provide a compact handoff summary (except the consolidator) in markdown with sections:",
     "   - Outcome",
     "   - Files touched",
     "   - Commands run",
     "   - Next-stage briefing",
-    "3. Also tell it to run the /conductor-learn skill and follow its instructions when it is finishd with its work.", 
-    "4. Use the handoff summary as explicit context for the next subagent stage.",
+    "3. Also tell it to run the /conductor-learn skill (except for consolidator and Committer) and follow its instructions when it is finishd with its work.", 
+    "4. Use the handoff summary as explicit context for the next subagent stage (except consolidator).",
     "",
     "Important:",
     "Make sure the coder and reviewer are given the paths to any relevant design or research artifacts, and make sure they read them.",
     "- The coder should not run, test, or debug its code. It only writes code.",
     "- The reviewer does not debug code. It only reads the code and makes changes as needed. When it is done it runs any tests and tells you if the Debugger agent is needed or should be skipped.",
+    "- The consolidator's sole purpose is to consolidate and organize knowledge/memories across AGENTS.md files in project directories. It does not need any context as it will be automatically prompted with what to do and it consolidates both old and new knowledge.",
     "",
     `Pipeline goal: ${goal}`,
     "",
     "Return a final orchestration report with each stage result and handoff summary.",
+  ].join("\n")
+}
+
+function consolidatePrompt(args: string) {
+  return [
+    "Invoke the consolidator subagent.",
+    "The consolidator's sole purpose is to consolidate and organize knowledge/memories across AGENTS.md files in project directories.",
+    "It does not need any context as it will be automatically prompted with what to do and it consolidates both old and new knowledge.",
+    "",
+    "Return a concise completion note with the consolidation summary from the subagent.",
   ].join("\n")
 }
 
@@ -152,6 +163,9 @@ export async function buildCommandPrompt(root: string, cmd: string, args: string
   }
   if (name === "code") {
     return `${pipelinePrompt(args)}\n\nCurrent Conductor state mode: ${state.mode}`
+  }
+  if (name === "consolidate") {
+    return consolidatePrompt(args)
   }
   return null
 }

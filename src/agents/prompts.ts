@@ -5,7 +5,7 @@ const promptRoot = [
   new URL("../src/agents/prompts/", import.meta.url),
 ]
 
-const names = ["conductor", "researcher", "architect", "coder", "reviewer", "debugger", "committer"] as const
+const names = ["conductor", "researcher", "architect", "coder", "reviewer", "debugger", "consolidator", "committer"] as const
 
 type PromptName = (typeof names)[number]
 

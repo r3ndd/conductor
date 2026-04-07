@@ -64,4 +64,11 @@ describe("state and runtime prompts", () => {
       expect(state.last.plan).toBeTruthy()
     })
   })
+
+  it("builds consolidate orchestration prompt for consolidator-only flow", async () => {
+    await withTmp(async (root) => {
+      const out = await buildCommandPrompt(root, "consolidate", "Refresh AGENTS memory organization")
+      expect(out?.includes("Invoke the consolidator subagent")).toBeTrue()
+    })
+  })
 })
