@@ -73,7 +73,7 @@ function pipelinePrompt(args: string) {
     "   - Files touched",
     "   - Commands run",
     "   - Next-stage briefing",
-    "3. After the subagent finishes, tell it to run the /conductor-learn skill.",
+    "3. After the subagent finishes, tell it to run the /conductor-learn skill. **Send this instruction to the subagent only after the subagent returns its handoff summary.**",
     "4. Use the handoff summary as explicit context for the next subagent stage.",
     "",
     "Important:",
@@ -96,7 +96,7 @@ function researchPrompt(args: string, file: string) {
     "",
     `Research goal: ${goal}`,
     "",
-    "After researcher finishes, tell it to run the /conductor-learn skill.",
+    "After researcher finishes, tell it to run the /conductor-learn skill. **Send this instruction to the subagent only after the researcher returns its handoff summary.**",
     "",
     "Return a concise completion note including the research artifact path.",
   ].join("\n")
