@@ -106,6 +106,7 @@ function architectPrompt(args: string, file: string) {
   const goal = args.trim() || "Create a design proposal based on project goals."
   return [
     "Invoke the architect subagent and manage a full handoff cycle.",
+    `Tell it to write the final design artifact to: ${file}`,
     "Be sure to pass it any relevant brainstorm artifact file paths and make sure it reads them.",
     "",
     `Architecture goal: ${goal}`,
