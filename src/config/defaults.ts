@@ -41,7 +41,7 @@ const basePluginAgents: Record<AgentName, AgentConfig> = {
     prompt: agentPrompts.researcher,
     permission: {
       edit: "deny",
-      bash: "ask",
+      bash: "allow",
       webfetch: "allow",
       external_directory: "ask",
     },
@@ -52,7 +52,7 @@ const basePluginAgents: Record<AgentName, AgentConfig> = {
     prompt: agentPrompts.architect,
     permission: {
       edit: "allow",
-      bash: "ask",
+      bash: "allow",
       webfetch: "allow",
       external_directory: "ask",
     },
