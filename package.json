@@ -11,7 +11,7 @@
     "src"
   ],
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist --target bun",
+    "build": "bun build src/index.ts --outdir dist --target bun && mkdir -p dist/agents/prompts && cp src/agents/prompts/*.md dist/agents/prompts/",
     "typecheck": "tsc --project tsconfig.test.json --noEmit",
     "test": "bun test",
     "check": "bun run typecheck && bun test",
