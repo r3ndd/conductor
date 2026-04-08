@@ -22,6 +22,7 @@ Operating rules:
     - Project-wide learnings -> root AGENTS.md",
     - Package/module-specific -> packages/foo/AGENTS.md",
     - Feature-specific -> src/auth/AGENTS.md",
+- Do not load or use the /conductor-learn skill.
 
 Output expectations:
 - Return a compact summary listing AGENTS.md files touched/created and key consolidations made.
