@@ -4,10 +4,18 @@ import { plansDir, researchDir, designsDir } from "../knowledge/paths"
 import { readState, setLast } from "../knowledge/state"
 import { ensureDir, exists } from "../util/fs"
 
-type Cmd = "brainstorm" | "research" | "architect" | "code" | "consolidate"
+type Cmd = "brainstorm" | "research" | "architect" | "code" | "consolidate" | "debug" | "commit"
 
 function normalize(cmd: string): Cmd | null {
-  if (cmd === "brainstorm" || cmd === "research" || cmd === "architect" || cmd === "code" || cmd === "consolidate") return cmd
+  if (
+    cmd === "brainstorm" ||
+    cmd === "research" ||
+    cmd === "architect" ||
+    cmd === "code" ||
+    cmd === "consolidate" ||
+    cmd === "debug" ||
+    cmd === "commit"
+  ) return cmd
   return null
 }
 
@@ -98,6 +106,35 @@ function consolidatePrompt(args: string) {
   ].join("\n")
 }
 
+function debugPrompt(args: string) {
+  const goal = args.trim() || "Diagnose and fix current issues outside the /code pipeline."
+  return [
+    "Invoke the debugger subagent and manage a full handoff cycle.",
+    "Tell it to focus on reproducing failures, applying targeted fixes, and validating with relevant tests.",
+    "Also tell it to provide a compact summary with: Outcome, Files touched, Commands run, and Remaining risks.",
+    "Also tell it to run the /conductor-learn skill and follow its instructions when it is finishd with its work.",
+    "",
+    `Debug goal: ${goal}`,
+    "",
+    "Return a concise completion note with the debugger summary from the subagent.",
+  ].join("\n")
+}
+
+function commitPrompt(args: string) {
+  const goal = args.trim() || "Prepare a safe commit for current changes outside the /code pipeline."
+  return [
+    "Invoke the committer subagent and manage a full handoff cycle.",
+    "Tell it to inspect git status/diff/log, stage relevant files, and create a safe, intentional commit message.",
+    "Tell it not to push unless explicitly requested.",
+    "Also tell it to provide a compact summary with commit message used and any follow-up actions.",
+    "Do not tell it to run or use the /conductor-learn skill.",
+    "",
+    `Commit goal: ${goal}`,
+    "",
+    "Return a concise completion note with the committer summary from the subagent.",
+  ].join("\n")
+}
+
 function researchPrompt(args: string, file: string) {
   const goal = args.trim() || "Investigate the project context and produce useful findings."
   return [
@@ -166,6 +203,12 @@ export async function buildCommandPrompt(root: string, cmd: string, args: string
   }
   if (name === "consolidate") {
     return consolidatePrompt(args)
+  }
+  if (name === "debug") {
+    return debugPrompt(args)
+  }
+  if (name === "commit") {
+    return commitPrompt(args)
   }
   return null
 }

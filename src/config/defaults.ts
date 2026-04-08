@@ -92,7 +92,7 @@ const basePluginAgents: Record<AgentName, AgentConfig> = {
   },
   consolidator: {
     mode: "subagent",
-    description: "Knowledge specialist that consolidates AGENTS.md learnings across project subdirectories.",
+    description: "Knowledge specialist that consolidates and organizes AGENTS.md learnings across project subdirectories.",
     prompt: agentPrompts.consolidator,
     permission: {
       edit: "allow",
@@ -151,10 +151,22 @@ export const pluginCommands = {
     template: "Run Conductor code pipeline workflow. $ARGUMENTS",
   },
   consolidate: {
-    description: "Run consolidator flow to organize AGENTS.md knowledge",
+    description: "Run consolidator subagent to organize AGENTS.md knowledge",
     agent: "conductor",
     subtask: false,
-    template: "Run Conductor consolidator workflow. $ARGUMENTS",
+    template: "Run Conductor consolidator subagent. $ARGUMENTS",
+  },
+  debug: {
+    description: "Run debugger subagent directly outside /code pipeline",
+    agent: "conductor",
+    subtask: false,
+    template: "Run Conductor debugger subagent. $ARGUMENTS",
+  },
+  commit: {
+    description: "Run committer subagent directly outside /code pipeline",
+    agent: "conductor",
+    subtask: false,
+    template: "Run Conductor committer subagent. $ARGUMENTS",
   },
   "conductor-doctor": {
     description: "Check Conductor setup and integrations",

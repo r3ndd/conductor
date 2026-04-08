@@ -71,4 +71,20 @@ describe("state and runtime prompts", () => {
       expect(out?.includes("Invoke the consolidator subagent")).toBeTrue()
     })
   })
+
+  it("builds debug orchestration prompt for debugger-only flow", async () => {
+    await withTmp(async (root) => {
+      const out = await buildCommandPrompt(root, "debug", "Fix failing integration test")
+      expect(out?.includes("Invoke the debugger subagent")).toBeTrue()
+      expect(out?.includes("Debug goal: Fix failing integration test")).toBeTrue()
+    })
+  })
+
+  it("builds commit orchestration prompt for committer-only flow", async () => {
+    await withTmp(async (root) => {
+      const out = await buildCommandPrompt(root, "commit", "Commit recent agent updates")
+      expect(out?.includes("Invoke the committer subagent")).toBeTrue()
+      expect(out?.includes("Commit goal: Commit recent agent updates")).toBeTrue()
+    })
+  })
 })

@@ -30,6 +30,8 @@ Conductor ships built-in agent prompt markdown files in `src/agents/prompts/` an
 - `/architect [prompt]`: orchestrate architect flow and persist `.conductor/designs/` artifact
 - `/code [prompt]`: orchestrate visible pipeline (`coder -> reviewer -> debugger if needed -> consolidator -> committer`)
 - `/consolidate [prompt]`: invoke consolidator-only flow to organize AGENTS.md knowledge
+- `/debug [prompt]`: invoke debugger-only flow outside the `/code` pipeline
+- `/commit [prompt]`: invoke committer-only flow outside the `/code` pipeline
 - `/conductor-doctor`: show Context7/Codanna integration diagnostics
 
 ## Behavior
