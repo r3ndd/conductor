@@ -89,6 +89,7 @@ function pipelinePrompt(args: string) {
     "- The coder should not run, test, or debug its code. It only writes code.",
     "- The reviewer does not debug code. It only reads the code and makes changes as needed. When it is done it runs any tests and tells you if the Debugger agent is needed or should be skipped.",
     "- The consolidator's sole purpose is to consolidate and organize knowledge/memories across AGENTS.md files in project directories. It does not need any context as it will be automatically prompted with what to do and it consolidates both old and new knowledge.",
+    "- The committer's purpose is to commit changes made in this pipeline.",
     "",
     `Pipeline goal: ${goal}`,
     "",
